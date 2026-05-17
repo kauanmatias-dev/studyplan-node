@@ -1,0 +1,53 @@
+<%- include('../partials/head', { title: 'Dashboard' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-admin', { page: 'dashboard' }) %>
+    <main class="main">
+        <div class="topbar">
+            <div><h1>Dashboard</h1><p>Visão geral da plataforma</p></div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-top"><div class="stat-icon blue">🎓</div></div>
+                <h3><%= totalCursos %></h3><p>Cursos ativos</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-top"><div class="stat-icon blue">📖</div></div>
+                <h3><%= totalUCs %></h3><p>Unidades Curriculares</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-top"><div class="stat-icon stone">👥</div></div>
+                <h3><%= totalAlunos %></h3><p>Alunos registados</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-top"><div class="stat-icon amber">📋</div></div>
+                <h3><%= fichasPendentes %></h3><p>Fichas para validar</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Fichas Submetidas</h3>
+                <a href="/admin/fichas" class="btn btn-secondary btn-sm">Ver todas</a>
+            </div>
+            <% if (fichasRecentes.length > 0) { %>
+            <table>
+                <thead><tr><th>Aluno</th><th>Curso pretendido</th><th>Submetido em</th><th>Ação</th></tr></thead>
+                <tbody>
+                <% fichasRecentes.forEach(f => { %>
+                <tr>
+                    <td><strong><%= f.utilizador.nome %></strong></td>
+                    <td><%= f.curso ? f.curso.nome : '—' %></td>
+                    <td style="color:var(--muted)"><%= new Date(f.updatedAt).toLocaleDateString('pt-PT') %></td>
+                    <td><a href="/admin/fichas?ver=<%= f._id %>" class="btn btn-secondary btn-xs">Analisar</a></td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state"><div class="empty-icon">✅</div><p>Nenhuma ficha pendente.</p></div>
+            <% } %>
+        </div>
+    </main>
+</div>
+</body></html>

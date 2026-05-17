@@ -1,0 +1,66 @@
+<%- include('../partials/head', { title: 'Início' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-aluno', { page: 'dashboard' }) %>
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <h1>Olá, <%= user.nome.split(' ')[0] %>! 👋</h1>
+                <p><%= new Date().toLocaleDateString('pt-PT', {weekday:'long',day:'numeric',month:'long',year:'numeric'}) %></p>
+            </div>
+        </div>
+
+        <% if (!ficha) { %>
+        <div class="alert alert-warning">⚠ Ainda não preencheu a ficha de aluno. <a href="/aluno/ficha" style="color:var(--warning);font-weight:600">Preencher agora →</a></div>
+        <% } else if (ficha.estado === 'rascunho') { %>
+        <div class="alert alert-warning">📝 A sua ficha está em rascunho. <a href="/aluno/ficha" style="color:var(--warning);font-weight:600">Submeter →</a></div>
+        <% } else if (ficha.estado === 'submetida') { %>
+        <div class="alert alert-info">⏳ A sua ficha aguarda validação pelo Gestor Pedagógico.</div>
+        <% } else if (ficha.estado === 'aprovada') { %>
+        <div class="alert alert-success">✓ Ficha aprovada! Pode fazer pedidos de matrícula.</div>
+        <% } else if (ficha.estado === 'rejeitada') { %>
+        <div class="alert alert-error">✕ Ficha rejeitada. <a href="/aluno/ficha" style="color:var(--danger);font-weight:600">Ver observações →</a></div>
+        <% } %>
+
+        <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><h3>Os meus Pedidos de Matrícula</h3><a href="/aluno/matriculas" class="btn btn-secondary btn-sm">Ver todos</a></div>
+            <% if (matriculas.length > 0) { %>
+            <table>
+                <thead><tr><th>Curso</th><th>Ano letivo</th><th>Estado</th></tr></thead>
+                <tbody>
+                <% matriculas.forEach(m => { %>
+                <tr>
+                    <td><strong><%= m.curso.nome %></strong></td>
+                    <td><%= m.anoLetivo %></td>
+                    <td><span class="badge estado-<%= m.estado %>"><%= m.estado.charAt(0).toUpperCase()+m.estado.slice(1) %></span></td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state" style="padding:24px"><div class="empty-icon">📄</div><p>Sem pedidos. <a href="/aluno/cursos" style="color:var(--accent)">Ver cursos →</a></p></div>
+            <% } %>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>As minhas Notas</h3><a href="/aluno/notas" class="btn btn-secondary btn-sm">Ver todas</a></div>
+            <% if (notas.length > 0) { %>
+            <table>
+                <thead><tr><th>UC</th><th>Ano letivo</th><th>Época</th><th>Nota</th></tr></thead>
+                <tbody>
+                <% notas.forEach(n => { %>
+                <tr>
+                    <td><strong><%= n.pauta.uc.nome %></strong></td>
+                    <td><%= n.pauta.anoLetivo %></td>
+                    <td><span class="badge estado-<%= n.pauta.epoca %>"><%= n.pauta.epoca %></span></td>
+                    <td><strong style="color:<%= n.nota>=10?'#166534':'var(--danger)' %>"><%= n.nota.toFixed(1) %></strong></td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state" style="padding:24px"><div class="empty-icon">📊</div><p>Nenhuma nota disponível ainda.</p></div>
+            <% } %>
+        </div>
+    </main>
+</div>
+</body></html>

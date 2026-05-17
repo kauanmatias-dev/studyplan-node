@@ -1,0 +1,25 @@
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">📚</div>
+        <span class="sidebar-logo-text">StudyPlan</span>
+    </div>
+    <div class="sidebar-perfil">🏛 Serviços Académicos</div>
+    <nav>
+        <div class="nav-label">Geral</div>
+        <% var d = page==='dashboard' ? 'active' : ''; %>
+        <a href="/funcionario" class="nav-item <%=d%>"><span class="nav-icon">📊</span> Dashboard</a>
+        <div class="nav-label">Matrículas</div>
+        <% var m = page==='matriculas' ? 'active' : ''; %>
+        <a href="/funcionario/matriculas" class="nav-item <%=m%>"><span class="nav-icon">📋</span> Pedidos de Matrícula</a>
+        <div class="nav-label">Avaliação</div>
+        <% var p = page==='pautas' ? 'active' : ''; %>
+        <a href="/funcionario/pautas" class="nav-item <%=p%>"><span class="nav-icon">📝</span> Pautas</a>
+    </nav>
+    <div class="sidebar-user">
+        <div class="user-avatar"><%=user.nome.charAt(0).toUpperCase()%></div>
+        <div class="user-info">
+            <strong><%=user.nome%></strong>
+            <small><a href="/logout" style="color:var(--muted)">Terminar sessão</a></small>
+        </div>
+    </div>
+</aside>

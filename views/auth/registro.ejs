@@ -1,0 +1,48 @@
+<%- include('../partials/head', { title: 'Criar Conta' }) %>
+<div class="auth-wrap">
+    <div class="auth-banner">
+        <div class="banner-logo"><span>📚</span> StudyPlan</div>
+        <div class="banner-content">
+            <h1>Comece a sua jornada académica</h1>
+            <p>Crie a sua conta de aluno para aceder a cursos, submeter a ficha e acompanhar o seu percurso.</p>
+        </div>
+        <div class="banner-badges">
+            <span class="banner-badge">✓ Gratuito</span>
+            <span class="banner-badge">✓ Seguro</span>
+            <span class="banner-badge">✓ Fácil de usar</span>
+        </div>
+    </div>
+    <div class="auth-form-area">
+        <div class="auth-form-box">
+            <h2>Criar conta</h2>
+            <p class="subtitle">Registo exclusivo para alunos.</p>
+
+            <% if (erro) { %><div class="alert alert-error">⚠ <%= erro %></div><% } %>
+            <% if (sucesso) { %><div class="alert alert-success">✓ <%= sucesso %></div><% } %>
+
+            <form method="POST" action="/registro">
+                <div class="form-group">
+                    <label>Nome completo</label>
+                    <input type="text" name="nome" placeholder="O seu nome" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" name="email" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" name="senha" placeholder="Mín. 6 caracteres" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar</label>
+                        <input type="password" name="confirmar" placeholder="Repita" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Criar conta →</button>
+            </form>
+            <div class="auth-link">Já tem conta? <a href="/login">Entrar</a></div>
+        </div>
+    </div>
+</div>
+</body></html>

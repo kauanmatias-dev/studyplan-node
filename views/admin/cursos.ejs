@@ -1,0 +1,87 @@
+<%- include('../partials/head', { title: 'Cursos' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-admin', { page: 'cursos' }) %>
+    <main class="main">
+        <div class="topbar">
+            <div><h1>Cursos</h1><p>Gira os cursos da plataforma.</p></div>
+            <button class="btn btn-primary" style="width:auto" onclick="document.getElementById('modal-criar').classList.add('open')">+ Novo Curso</button>
+        </div>
+
+        <% if (typeof sucesso !== 'undefined' && sucesso) { %><div class="alert alert-success">✓ <%= sucesso %></div><% } %>
+
+        <div class="card">
+            <div class="card-header"><h3>Todos os Cursos (<%= cursos.length %>)</h3></div>
+            <% if (cursos.length > 0) { %>
+            <table>
+                <thead><tr><th>Nome</th><th>Duração</th><th>Estado</th><th>Ações</th></tr></thead>
+                <tbody>
+                <% cursos.forEach(c => { %>
+                <tr>
+                    <td><strong><%= c.nome %></strong><br><small style="color:var(--muted)"><%= (c.descricao||'').substring(0,60) %></small></td>
+                    <td><%= c.duracaoAnos %> anos</td>
+                    <td><span class="badge <%= c.ativo ? 'badge-green' : 'badge-stone' %>"><%= c.ativo ? 'Ativo' : 'Inativo' %></span></td>
+                    <td style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button class="btn btn-secondary btn-xs" onclick="abrirEditar('<%= c._id %>','<%= c.nome %>','<%= c.descricao||'' %>',<%= c.duracaoAnos %>,<%= c.ativo %>)">Editar</button>
+                        <a href="/admin/plano?curso=<%= c._id %>" class="btn btn-secondary btn-xs">Plano</a>
+                        <a href="/admin/cursos/apagar/<%= c._id %>" class="btn btn-danger btn-xs" onclick="return confirm('Apagar?')">Apagar</a>
+                    </td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state"><div class="empty-icon">🎓</div><p>Nenhum curso ainda.</p></div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<!-- Modal Criar -->
+<div class="modal-overlay" id="modal-criar">
+    <div class="modal">
+        <div class="modal-header"><h3>Novo Curso</h3><button class="modal-close" onclick="document.getElementById('modal-criar').classList.remove('open')">✕</button></div>
+        <form method="POST" action="/admin/cursos/criar">
+            <div class="form-group"><label>Nome</label><input type="text" name="nome" required placeholder="Ex: Engenharia Informática"></div>
+            <div class="form-group"><label>Descrição</label><textarea name="descricao" placeholder="Descrição..."></textarea></div>
+            <div class="form-group"><label>Duração (anos)</label>
+                <select name="duracaoAnos">
+                    <% [1,2,3,4,5].forEach(n => { %><option value="<%= n %>" <%= n===3?'selected':'' %>><%= n %> ano<%= n>1?'s':'' %></option><% }) %>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Criar Curso</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal-overlay" id="modal-editar">
+    <div class="modal">
+        <div class="modal-header"><h3>Editar Curso</h3><button class="modal-close" onclick="document.getElementById('modal-editar').classList.remove('open')">✕</button></div>
+        <form method="POST" id="form-editar">
+            <div class="form-group"><label>Nome</label><input type="text" name="nome" id="edit-nome" required></div>
+            <div class="form-group"><label>Descrição</label><textarea name="descricao" id="edit-desc"></textarea></div>
+            <div class="form-group"><label>Duração (anos)</label>
+                <select name="duracaoAnos" id="edit-anos">
+                    <% [1,2,3,4,5].forEach(n => { %><option value="<%= n %>"><%= n %> ano<%= n>1?'s':'' %></option><% }) %>
+                </select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;gap:8px">
+                <input type="checkbox" name="ativo" id="edit-ativo" style="width:auto">
+                <label for="edit-ativo" style="text-transform:none;font-size:0.9rem;margin:0">Curso ativo</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirEditar(id, nome, desc, anos, ativo) {
+    document.getElementById('form-editar').action = '/admin/cursos/editar/' + id;
+    document.getElementById('edit-nome').value = nome;
+    document.getElementById('edit-desc').value = desc;
+    document.getElementById('edit-anos').value = anos;
+    document.getElementById('edit-ativo').checked = ativo;
+    document.getElementById('modal-editar').classList.add('open');
+}
+</script>
+</body></html>

@@ -1,0 +1,45 @@
+<%- include('../partials/head', { title: 'As minhas Notas' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-aluno', { page: 'notas' }) %>
+    <main class="main">
+        <div class="topbar"><div><h1>As minhas Notas</h1><p>Histórico de avaliações.</p></div></div>
+
+        <div class="stats-row" style="margin-bottom:24px">
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon blue">📅</div></div><h3><%= total %></h3><p>Avaliações totais</p></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon blue">✅</div></div><h3><%= aprovadas %></h3><p>Aprovações</p></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon amber">⭐</div></div><h3><%= media || '—' %></h3><p>Média geral</p></div>
+        </div>
+
+        <% if (Object.keys(porAno).length > 0) { %>
+            <% Object.keys(porAno).sort().reverse().forEach(ano => { %>
+            <div class="card" style="margin-bottom:18px">
+                <div class="card-header"><h3>📅 Ano Letivo <%= ano %></h3></div>
+                <table>
+                    <thead><tr><th>Unidade Curricular</th><th>Curso</th><th>Época</th><th>Créditos</th><th>Nota</th><th>Resultado</th></tr></thead>
+                    <tbody>
+                    <% porAno[ano].forEach(n => { %>
+                    <tr>
+                        <td><strong><%= n.pauta.uc.nome %></strong></td>
+                        <td style="color:var(--muted)"><%= n.pauta.curso.nome %></td>
+                        <td><span class="badge estado-<%= n.pauta.epoca %>"><%= n.pauta.epoca %></span></td>
+                        <td><%= n.pauta.uc.creditos %> ECTS</td>
+                        <td><strong style="font-size:1.05rem;color:<%= n.nota>=10?'#166534':'var(--danger)' %>"><%= n.nota.toFixed(1) %></strong></td>
+                        <td>
+                            <% if (n.nota >= 10) { %>
+                                <span class="badge badge-green">Aprovado</span>
+                            <% } else { %>
+                                <span class="badge badge-red">Reprovado</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <% }) %>
+        <% } else { %>
+        <div class="empty-state"><div class="empty-icon">📊</div><p>Nenhuma nota disponível ainda.</p></div>
+        <% } %>
+    </main>
+</div>
+</body></html>

@@ -1,0 +1,84 @@
+<%- include('../partials/head', { title: 'Fichas' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-admin', { page: 'fichas' }) %>
+    <main class="main">
+        <div class="topbar"><div><h1>Fichas de Aluno</h1><p>Valide ou rejeite fichas submetidas.</p></div></div>
+
+        <% if (sucesso) { %><div class="alert alert-success">✓ <%= sucesso %></div><% } %>
+
+        <div style="display:flex;gap:8px;margin-bottom:20px">
+            <% [['submetida','Submetidas'],['aprovada','Aprovadas'],['rejeitada','Rejeitadas'],['rascunho','Rascunhos']].forEach(([k,v]) => { %>
+            <a href="/admin/fichas?filtro=<%= k %>" class="btn <%= filtro===k?'btn-primary':'btn-secondary' %> btn-sm" style="<%= filtro===k?'width:auto':'' %>"><%= v %></a>
+            <% }) %>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>Fichas: <%= filtro.charAt(0).toUpperCase()+filtro.slice(1) %> (<%= fichas.length %>)</h3></div>
+            <% if (fichas.length > 0) { %>
+            <table>
+                <thead><tr><th>Aluno</th><th>Curso</th><th>Data</th><th>Estado</th><th>Ação</th></tr></thead>
+                <tbody>
+                <% fichas.forEach(f => { %>
+                <tr>
+                    <td><strong><%= f.utilizador.nome %></strong><br><small style="color:var(--muted)"><%= f.utilizador.email %></small></td>
+                    <td><%= f.curso ? f.curso.nome : '—' %></td>
+                    <td style="color:var(--muted)"><%= new Date(f.updatedAt).toLocaleDateString('pt-PT') %></td>
+                    <td><span class="badge estado-<%= f.estado %>"><%= f.estado.charAt(0).toUpperCase()+f.estado.slice(1) %></span></td>
+                    <td><a href="/admin/fichas?ver=<%= f._id %>&filtro=<%= filtro %>" class="btn btn-secondary btn-xs">Ver ficha</a></td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state"><div class="empty-icon">📋</div><p>Nenhuma ficha com este estado.</p></div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<% if (ver) { %>
+<div class="modal-overlay open">
+    <div class="modal" style="max-width:580px">
+        <div class="modal-header">
+            <h3>Ficha de <%= ver.utilizador.nome %></h3>
+            <button class="modal-close" onclick="window.location='/admin/fichas?filtro=<%= filtro %>'">✕</button>
+        </div>
+
+        <% if (ver.foto) { %>
+            <img src="/uploads/<%= ver.foto %>" class="foto-preview" alt="Foto">
+        <% } else { %>
+            <div class="foto-placeholder">👤</div>
+        <% } %>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0">
+            <div><small style="color:var(--muted)">Data de Nascimento</small><p><%= ver.dataNascimento ? new Date(ver.dataNascimento).toLocaleDateString('pt-PT') : '—' %></p></div>
+            <div><small style="color:var(--muted)">Telefone</small><p><%= ver.telefone || '—' %></p></div>
+            <div><small style="color:var(--muted)">Naturalidade</small><p><%= ver.naturalidade || '—' %></p></div>
+            <div><small style="color:var(--muted)">Nacionalidade</small><p><%= ver.nacionalidade || '—' %></p></div>
+            <div style="grid-column:1/-1"><small style="color:var(--muted)">Morada</small><p><%= ver.morada || '—' %></p></div>
+            <div style="grid-column:1/-1"><small style="color:var(--muted)">Curso pretendido</small><p><strong><%= ver.curso ? ver.curso.nome : '—' %></strong></p></div>
+        </div>
+
+        <% if (ver.observacoes) { %>
+        <div class="alert alert-info">💬 <%= ver.observacoes %></div>
+        <% } %>
+
+        <% if (ver.estado === 'submetida') { %>
+        <form method="POST" action="/admin/fichas/decidir/<%= ver._id %>">
+            <input type="hidden" name="filtro" value="<%= filtro %>">
+            <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Registe as suas observações..."></textarea></div>
+            <div style="display:flex;gap:10px">
+                <button type="submit" name="acao" value="aprovar" class="btn btn-success" style="flex:1;justify-content:center">✓ Aprovar</button>
+                <button type="submit" name="acao" value="rejeitar" class="btn btn-danger" style="flex:1;justify-content:center" onclick="return confirm('Rejeitar?')">✕ Rejeitar</button>
+            </div>
+        </form>
+        <% } else { %>
+        <div class="alert <%= ver.estado==='aprovada'?'alert-success':'alert-error' %>">
+            <%= ver.estado==='aprovada'?'✓ Aprovada':'✕ Rejeitada' %>
+            <% if (ver.validadoPor) { %> por <strong><%= ver.validadoPor.nome %></strong> em <%= new Date(ver.validadoEm).toLocaleDateString('pt-PT') %><% } %>
+        </div>
+        <% } %>
+    </div>
+</div>
+<% } %>
+</body></html>

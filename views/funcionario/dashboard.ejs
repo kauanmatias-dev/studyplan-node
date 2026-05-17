@@ -1,0 +1,33 @@
+<%- include('../partials/head', { title: 'Dashboard' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-funcionario', { page: 'dashboard' }) %>
+    <main class="main">
+        <div class="topbar"><div><h1>Serviços Académicos</h1><p><%= new Date().toLocaleDateString('pt-PT', {weekday:'long',day:'numeric',month:'long',year:'numeric'}) %></p></div></div>
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon amber">⏳</div></div><h3><%= pendentes %></h3><p>Matrículas pendentes</p></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon blue">✅</div></div><h3><%= aprovadas %></h3><p>Matrículas aprovadas</p></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon blue">📝</div></div><h3><%= totalPautas %></h3><p>Pautas criadas</p></div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h3>Últimos Pedidos</h3><a href="/funcionario/matriculas" class="btn btn-secondary btn-sm">Ver todos</a></div>
+            <% if (ultimas.length > 0) { %>
+            <table>
+                <thead><tr><th>Aluno</th><th>Curso</th><th>Ano letivo</th><th>Estado</th></tr></thead>
+                <tbody>
+                <% ultimas.forEach(m => { %>
+                <tr>
+                    <td><strong><%= m.utilizador.nome %></strong></td>
+                    <td><%= m.curso.nome %></td>
+                    <td><%= m.anoLetivo %></td>
+                    <td><span class="badge estado-<%= m.estado %>"><%= m.estado.charAt(0).toUpperCase()+m.estado.slice(1) %></span></td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state"><div class="empty-icon">📭</div><p>Nenhum pedido ainda.</p></div>
+            <% } %>
+        </div>
+    </main>
+</div>
+</body></html>

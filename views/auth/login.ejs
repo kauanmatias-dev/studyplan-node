@@ -1,0 +1,49 @@
+<%- include('../partials/head', { title: 'Login' }) %>
+<div class="auth-wrap">
+    <div class="auth-banner">
+        <div class="banner-logo"><span>📚</span> StudyPlan</div>
+        <div class="banner-content">
+            <h1>Gestão Académica Simplificada</h1>
+            <p>Plataforma integrada para gestão de cursos, matrículas, fichas de aluno e pautas de avaliação.</p>
+        </div>
+        <div class="banner-badges">
+            <span class="banner-badge">🎓 Alunos</span>
+            <span class="banner-badge">🏛 Serviços Académicos</span>
+            <span class="banner-badge">⚙ Gestão Pedagógica</span>
+        </div>
+    </div>
+    <div class="auth-form-area">
+        <div class="auth-form-box">
+            <h2>Bem-vindo</h2>
+            <p class="subtitle">Introduza as suas credenciais para aceder.</p>
+
+            <% if (erro) { %>
+                <div class="alert alert-error">⚠ <%= erro %></div>
+            <% } %>
+
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" name="email" placeholder="utilizador@email.com" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label>Palavra-passe</label>
+                    <input type="password" name="senha" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Entrar →</button>
+            </form>
+
+            <div class="auth-link">
+                Novo aluno? <a href="/registro">Criar conta</a>
+            </div>
+
+            <div style="margin-top:28px;padding:16px;background:var(--bg);border-radius:var(--radius);font-size:0.78rem;color:var(--muted);">
+                <strong style="display:block;margin-bottom:6px;color:var(--text)">Contas de demonstração:</strong>
+                Gestor: gestor@studyplan.com<br>
+                Funcionário: func@studyplan.com<br>
+                Senha: <strong>password</strong>
+            </div>
+        </div>
+    </div>
+</div>
+</body></html>

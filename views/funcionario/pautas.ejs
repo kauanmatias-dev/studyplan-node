@@ -1,0 +1,119 @@
+<%- include('../partials/head', { title: 'Pautas' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-funcionario', { page: 'pautas' }) %>
+    <main class="main">
+        <div class="topbar">
+            <div><h1>Pautas de Avaliação</h1><p>Crie pautas e lance notas por UC.</p></div>
+            <% if (!pautaSel) { %>
+            <button class="btn btn-primary" style="width:auto" onclick="document.getElementById('modal-pauta').classList.add('open')">+ Nova Pauta</button>
+            <% } %>
+        </div>
+
+        <% if (erro) { %><div class="alert alert-error">⚠ <%= erro %></div><% } %>
+        <% if (sucesso) { %><div class="alert alert-success">✓ <%= sucesso %></div><% } %>
+
+        <% if (pautaSel) { %>
+        <div class="alert alert-info" style="margin-bottom:16px">
+            📝 <strong><%= pautaSel.uc.nome %></strong> — <%= pautaSel.curso.nome %> | <%= pautaSel.anoLetivo %> | Época <%= pautaSel.epoca %>
+            <a href="/funcionario/pautas" style="margin-left:12px;color:var(--accent)">← Voltar</a>
+        </div>
+        <div class="card">
+            <div class="card-header"><h3>Lançamento de Notas (<%= notas.length %> alunos)</h3></div>
+            <% if (notas.length > 0) { %>
+            <form method="POST" action="/funcionario/pautas/notas/<%= pautaSel._id %>">
+                <table>
+                    <thead><tr><th>Aluno</th><th>Nota (0–20)</th><th>Observações</th></tr></thead>
+                    <tbody>
+                    <% notas.forEach(n => { %>
+                    <tr>
+                        <td><strong><%= n.utilizador.nome %></strong></td>
+                        <td><input type="number" name="notas[<%= n.utilizador._id %>]" class="nota-input" value="<%= n.nota !== null && n.nota !== undefined ? n.nota : '' %>" min="0" max="20" step="0.1" placeholder="—"></td>
+                        <td><input type="text" name="obs[<%= n.utilizador._id %>]" style="width:100%;padding:5px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:0.85rem" value="<%= n.observacoes||'' %>" placeholder="Opcional"></td>
+                    </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+                <div style="padding:16px 22px;border-top:1px solid var(--border)">
+                    <button type="submit" class="btn btn-primary" style="width:auto">💾 Guardar Notas</button>
+                </div>
+            </form>
+            <% } else { %>
+            <div class="empty-state"><div class="empty-icon">👥</div><p>Nenhum aluno matriculado neste curso.</p></div>
+            <% } %>
+        </div>
+
+        <% } else { %>
+        <div class="card">
+            <div class="card-header"><h3>Todas as Pautas (<%= pautas.length %>)</h3></div>
+            <% if (pautas.length > 0) { %>
+            <table>
+                <thead><tr><th>UC</th><th>Curso</th><th>Ano Letivo</th><th>Época</th><th>Criada por</th><th>Ações</th></tr></thead>
+                <tbody>
+                <% pautas.forEach(p => { %>
+                <tr>
+                    <td><strong><%= p.uc.nome %></strong></td>
+                    <td><%= p.curso.nome %></td>
+                    <td><%= p.anoLetivo %></td>
+                    <td><span class="badge estado-<%= p.epoca %>"><%= p.epoca %></span></td>
+                    <td style="color:var(--muted)"><%= p.criadoPor ? p.criadoPor.nome : '—' %></td>
+                    <td style="display:flex;gap:6px">
+                        <a href="/funcionario/pautas?pauta=<%= p._id %>" class="btn btn-secondary btn-xs">Lançar notas</a>
+                        <a href="/funcionario/pautas/apagar/<%= p._id %>" class="btn btn-danger btn-xs" onclick="return confirm('Apagar pauta e notas?')">Apagar</a>
+                    </td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state"><div class="empty-icon">📝</div><p>Nenhuma pauta criada ainda.</p></div>
+            <% } %>
+        </div>
+        <% } %>
+    </main>
+</div>
+
+<div class="modal-overlay" id="modal-pauta">
+    <div class="modal">
+        <div class="modal-header"><h3>Nova Pauta</h3><button class="modal-close" onclick="document.getElementById('modal-pauta').classList.remove('open')">✕</button></div>
+        <form method="POST" action="/funcionario/pautas/criar">
+            <div class="form-group"><label>Curso</label>
+                <select name="curso" id="sel-curso" required onchange="filtrarUCs(this.value)">
+                    <option value="">Selecione...</option>
+                    <% cursos.forEach(c => { %><option value="<%= c._id %>"><%= c.nome %></option><% }) %>
+                </select>
+            </div>
+            <div class="form-group"><label>Unidade Curricular</label>
+                <select name="uc" id="sel-uc" required>
+                    <option value="">Selecione primeiro um curso...</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Ano Letivo</label><input type="text" name="anoLetivo" placeholder="Ex: 2024/2025" required value="<%= new Date().getFullYear() %>/<%= new Date().getFullYear()+1 %>"></div>
+                <div class="form-group"><label>Época</label>
+                    <select name="epoca" required>
+                        <option value="Normal">Normal</option>
+                        <option value="Recurso">Recurso</option>
+                        <option value="Especial">Especial</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Criar Pauta</button>
+        </form>
+    </div>
+</div>
+
+<script>
+const ucsPorCurso = <%- JSON.stringify(ucsPorCurso) %>;
+function filtrarUCs(cursoId) {
+    const sel = document.getElementById('sel-uc');
+    sel.innerHTML = '<option value="">Selecione uma UC...</option>';
+    if (!cursoId || !ucsPorCurso[cursoId]) return;
+    ucsPorCurso[cursoId].forEach(uc => {
+        const opt = document.createElement('option');
+        opt.value = uc.id;
+        opt.textContent = uc.nome;
+        sel.appendChild(opt);
+    });
+}
+</script>
+</body></html>

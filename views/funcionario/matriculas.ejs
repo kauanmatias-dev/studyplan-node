@@ -1,0 +1,70 @@
+<%- include('../partials/head', { title: 'Matrículas' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-funcionario', { page: 'matriculas' }) %>
+    <main class="main">
+        <div class="topbar"><div><h1>Pedidos de Matrícula</h1><p>Aprove ou rejeite pedidos dos alunos.</p></div></div>
+
+        <% if (sucesso) { %><div class="alert alert-success">✓ <%= sucesso %></div><% } %>
+
+        <div style="display:flex;gap:8px;margin-bottom:20px">
+            <% [['pendente','Pendentes'],['aprovada','Aprovadas'],['rejeitada','Rejeitadas']].forEach(([k,v]) => { %>
+            <a href="/funcionario/matriculas?filtro=<%= k %>" class="btn <%= filtro===k?'btn-primary':'btn-secondary' %> btn-sm" style="<%= filtro===k?'width:auto':'' %>"><%= v %></a>
+            <% }) %>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>Pedidos: <%= filtro.charAt(0).toUpperCase()+filtro.slice(1) %> (<%= matriculas.length %>)</h3></div>
+            <% if (matriculas.length > 0) { %>
+            <table>
+                <thead><tr><th>Aluno</th><th>Curso</th><th>Ano Letivo</th><th>Submetido</th><th>Estado</th><th>Ação</th></tr></thead>
+                <tbody>
+                <% matriculas.forEach(m => { %>
+                <tr>
+                    <td><strong><%= m.utilizador.nome %></strong><br><small style="color:var(--muted)"><%= m.utilizador.email %></small></td>
+                    <td><%= m.curso.nome %></td>
+                    <td><%= m.anoLetivo %></td>
+                    <td style="color:var(--muted)"><%= new Date(m.createdAt).toLocaleDateString('pt-PT') %></td>
+                    <td><span class="badge estado-<%= m.estado %>"><%= m.estado.charAt(0).toUpperCase()+m.estado.slice(1) %></span></td>
+                    <td><a href="/funcionario/matriculas?ver=<%= m._id %>&filtro=<%= filtro %>" class="btn btn-secondary btn-xs">Ver</a></td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="empty-state"><div class="empty-icon">📋</div><p>Nenhum pedido neste estado.</p></div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<% if (ver) { %>
+<div class="modal-overlay open">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Pedido de Matrícula</h3>
+            <button class="modal-close" onclick="window.location='/funcionario/matriculas?filtro=<%= filtro %>'">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+            <div><small style="color:var(--muted)">Aluno</small><p><strong><%= ver.utilizador.nome %></strong></p></div>
+            <div><small style="color:var(--muted)">E-mail</small><p><%= ver.utilizador.email %></p></div>
+            <div><small style="color:var(--muted)">Curso</small><p><%= ver.curso.nome %></p></div>
+            <div><small style="color:var(--muted)">Ano Letivo</small><p><%= ver.anoLetivo %></p></div>
+            <div><small style="color:var(--muted)">Submetido em</small><p><%= new Date(ver.createdAt).toLocaleDateString('pt-PT') %></p></div>
+            <div><small style="color:var(--muted)">Estado</small><p><span class="badge estado-<%= ver.estado %>"><%= ver.estado.charAt(0).toUpperCase()+ver.estado.slice(1) %></span></p></div>
+        </div>
+        <% if (ver.observacoes) { %><div class="alert alert-info">💬 <%= ver.observacoes %></div><% } %>
+        <% if (ver.decididoPor) { %><p style="font-size:0.82rem;color:var(--muted);margin-bottom:16px">Decidido por <strong><%= ver.decididoPor.nome %></strong> em <%= new Date(ver.decididoEm).toLocaleDateString('pt-PT') %></p><% } %>
+        <% if (ver.estado === 'pendente') { %>
+        <form method="POST" action="/funcionario/matriculas/decidir/<%= ver._id %>">
+            <input type="hidden" name="filtro" value="<%= filtro %>">
+            <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Justificação..."></textarea></div>
+            <div style="display:flex;gap:10px">
+                <button type="submit" name="acao" value="aprovar" class="btn btn-success" style="flex:1;justify-content:center">✓ Aprovar</button>
+                <button type="submit" name="acao" value="rejeitar" class="btn btn-danger" style="flex:1;justify-content:center">✕ Rejeitar</button>
+            </div>
+        </form>
+        <% } %>
+    </div>
+</div>
+<% } %>
+</body></html>

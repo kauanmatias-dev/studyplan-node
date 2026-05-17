@@ -1,0 +1,30 @@
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">📚</div>
+        <span class="sidebar-logo-text">StudyPlan</span>
+    </div>
+    <div class="sidebar-perfil">🎓 Aluno</div>
+    <nav>
+        <div class="nav-label">Geral</div>
+        <% var d = page==='dashboard' ? 'active' : ''; %>
+        <a href="/aluno" class="nav-item <%=d%>"><span class="nav-icon">🏠</span> Início</a>
+        <div class="nav-label">O meu perfil</div>
+        <% var fi = page==='ficha' ? 'active' : ''; %>
+        <a href="/aluno/ficha" class="nav-item <%=fi%>"><span class="nav-icon">📋</span> Ficha de Aluno</a>
+        <div class="nav-label">Matrículas</div>
+        <% var c = page==='cursos' ? 'active' : ''; %>
+        <a href="/aluno/cursos" class="nav-item <%=c%>"><span class="nav-icon">🎓</span> Cursos disponíveis</a>
+        <% var m = page==='matriculas' ? 'active' : ''; %>
+        <a href="/aluno/matriculas" class="nav-item <%=m%>"><span class="nav-icon">📄</span> Os meus pedidos</a>
+        <div class="nav-label">Avaliação</div>
+        <% var n = page==='notas' ? 'active' : ''; %>
+        <a href="/aluno/notas" class="nav-item <%=n%>"><span class="nav-icon">📊</span> As minhas notas</a>
+    </nav>
+    <div class="sidebar-user">
+        <div class="user-avatar"><%=user.nome.charAt(0).toUpperCase()%></div>
+        <div class="user-info">
+            <strong><%=user.nome%></strong>
+            <small><a href="/logout" style="color:var(--muted)">Terminar sessão</a></small>
+        </div>
+    </div>
+</aside>

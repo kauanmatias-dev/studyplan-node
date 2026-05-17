@@ -1,0 +1,36 @@
+<%- include('../partials/head', { title: 'Os meus Pedidos' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-aluno', { page: 'matriculas' }) %>
+    <main class="main">
+        <div class="topbar">
+            <div><h1>Os meus Pedidos</h1><p>Acompanhe o estado das suas matrículas.</p></div>
+            <a href="/aluno/cursos" class="btn btn-primary" style="width:auto">+ Novo pedido</a>
+        </div>
+
+        <% if (matriculas.length > 0) { %>
+        <div style="display:flex;flex-direction:column;gap:14px">
+        <% matriculas.forEach(m => { %>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+                <div>
+                    <h3 style="font-size:1rem;font-weight:700;margin-bottom:4px"><%= m.curso.nome %></h3>
+                    <p style="color:var(--muted);font-size:0.83rem">Ano letivo: <%= m.anoLetivo %> · Submetido em <%= new Date(m.createdAt).toLocaleDateString('pt-PT') %></p>
+                    <% if (m.observacoes) { %>
+                        <p style="margin-top:8px;font-size:0.83rem;color:var(--muted)">💬 <%= m.observacoes %></p>
+                    <% } %>
+                    <% if (m.decididoPor) { %>
+                        <p style="font-size:0.78rem;color:var(--muted);margin-top:4px">Decidido por <strong><%= m.decididoPor.nome %></strong> em <%= new Date(m.decididoEm).toLocaleDateString('pt-PT') %></p>
+                    <% } %>
+                </div>
+                <span class="badge estado-<%= m.estado %>" style="font-size:0.82rem;padding:6px 14px"><%= m.estado.charAt(0).toUpperCase()+m.estado.slice(1) %></span>
+            </div>
+        <% }) %>
+        </div>
+        <% } else { %>
+        <div class="empty-state">
+            <div class="empty-icon">📄</div>
+            <p>Ainda não tem pedidos. <a href="/aluno/cursos" style="color:var(--accent)">Ver cursos →</a></p>
+        </div>
+        <% } %>
+    </main>
+</div>
+</body></html>

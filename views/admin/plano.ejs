@@ -1,0 +1,111 @@
+<%- include('../partials/head', { title: 'Plano de Estudos' }) %>
+<div class="layout">
+    <%- include('../partials/sidebar-admin', { page: 'plano' }) %>
+    <main class="main">
+        <div class="topbar">
+            <div><h1>Plano de Estudos</h1><p>Associe UCs aos cursos por ano e semestre.</p></div>
+            <% if (cursoSel) { %>
+            <button class="btn btn-primary" style="width:auto" onclick="document.getElementById('modal-add').classList.add('open')">+ Adicionar UC</button>
+            <% } %>
+        </div>
+
+        <% if (erro) { %><div class="alert alert-error">⚠ <%= erro %></div><% } %>
+        <% if (sucesso) { %><div class="alert alert-success">✓ <%= sucesso %></div><% } %>
+
+        <!-- Seletor de curso -->
+        <div class="card" style="margin-bottom:20px">
+            <div class="card-body">
+                <form method="GET" action="/admin/plano">
+                    <div class="form-group" style="margin:0">
+                        <label>Selecionar Curso</label>
+                        <select name="curso" onchange="this.form.submit()">
+                            <option value="">-- Selecione um curso --</option>
+                            <% cursos.forEach(c => { %>
+                            <option value="<%= c._id %>" <%= cursoSel && cursoSel._id.toString()===c._id.toString()?'selected':'' %>><%= c.nome %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <% if (cursoSel) { %>
+        <div class="alert alert-info">📚 Plano de: <strong><%= cursoSel.nome %></strong> (<%= cursoSel.duracaoAnos %> anos)</div>
+
+        <%
+        // Agrupar por ano e semestre
+        const porAno = {};
+        plano.forEach(p => {
+            if (!porAno[p.ano]) porAno[p.ano] = {};
+            if (!porAno[p.ano][p.semestre]) porAno[p.ano][p.semestre] = [];
+            porAno[p.ano][p.semestre].push(p);
+        });
+        %>
+
+        <% if (Object.keys(porAno).length > 0) { %>
+            <% Object.keys(porAno).sort().forEach(ano => { %>
+            <div class="card" style="margin-bottom:16px">
+                <div class="card-header"><h3>📅 <%= ano %>º Ano</h3></div>
+                <% Object.keys(porAno[ano]).sort().forEach(sem => { %>
+                <div style="padding:0 22px 16px">
+                    <p style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin:16px 0 10px"><%= sem %>º Semestre</p>
+                    <table>
+                        <thead><tr><th>UC</th><th>Créditos</th><th>Horas/sem</th><th>Ação</th></tr></thead>
+                        <tbody>
+                        <% porAno[ano][sem].forEach(p => { %>
+                        <tr>
+                            <td><strong><%= p.uc.nome %></strong></td>
+                            <td><%= p.uc.creditos %> ECTS</td>
+                            <td><%= p.uc.horasSemana %>h</td>
+                            <td><a href="/admin/plano/remover/<%= p._id %>" class="btn btn-danger btn-xs" onclick="return confirm('Remover?')">Remover</a></td>
+                        </tr>
+                        <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <% }) %>
+            </div>
+            <% }) %>
+        <% } else { %>
+            <div class="empty-state"><div class="empty-icon">🗂</div><p>Nenhuma UC no plano. Adicione a primeira!</p></div>
+        <% } %>
+        <% } else { %>
+        <div class="empty-state"><div class="empty-icon">👆</div><p>Selecione um curso para ver o plano.</p></div>
+        <% } %>
+    </main>
+</div>
+
+<div class="modal-overlay" id="modal-add">
+    <div class="modal">
+        <div class="modal-header"><h3>Adicionar UC ao Plano</h3><button class="modal-close" onclick="document.getElementById('modal-add').classList.remove('open')">✕</button></div>
+        <form method="POST" action="/admin/plano/adicionar">
+            <input type="hidden" name="curso" value="<%= cursoSel ? cursoSel._id : '' %>">
+            <div class="form-group">
+                <label>Unidade Curricular</label>
+                <select name="uc" required>
+                    <option value="">Selecione...</option>
+                    <% ucs.forEach(u => { %><option value="<%= u._id %>"><%= u.nome %></option><% }) %>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Ano</label>
+                    <select name="ano" required>
+                        <% for(let i=1; i<=(cursoSel?cursoSel.duracaoAnos:5); i++) { %>
+                        <option value="<%= i %>"><%= i %>º Ano</option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Semestre</label>
+                    <select name="semestre" required>
+                        <option value="1">1º Semestre</option>
+                        <option value="2">2º Semestre</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Adicionar ao Plano</button>
+        </form>
+    </div>
+</div>
+</body></html>
